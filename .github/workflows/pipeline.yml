@@ -1,0 +1,26 @@
+name: CancerDetection
+on: [push]
+jobs:
+ run:
+    runs-on: [ubuntu-latest]
+    container: docker://dvcorg/cml-py3:latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Import python libraries
+        env:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Install Python Libs
+          pip install -r requirements.txt
+           
+      - name: Train and Evaluate
+        env:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Train model
+          python pipeline_stage_train.py
+      
+          # Evaluate model
+          echo "MODEL METRICS" > report.md
+          cat metrics.txt >> report.md
+          cml-send-comment report.md
